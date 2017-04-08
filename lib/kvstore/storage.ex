@@ -5,8 +5,8 @@ defmodule Storage do
         GenServer.start_link(__MODULE__, %{}, name: Storage)
     end
 
-    def create(kv) do
-        GenServer.call(__MODULE__, {:create, kv})
+    def create(kv_ttl) do
+        GenServer.call(__MODULE__, {:create, kv_ttl})
     end
 
     def read(key) do
@@ -22,14 +22,14 @@ defmodule Storage do
     end
 
     def init(_) do
-        ttl = Application.get_env(:kvstore, :ttl, 60)
+        timer = 1000
         storage = Application.get_env(:kvstore, :storage, :kv_storage)
         {:ok, storage_table} = :dets.open_file(storage, [type: :set])
-        start_timer(ttl)
-        {:ok, %{:ttl => ttl, :storage_table => storage_table, :timer => 1000}}
+        start_timer(timer)
+        {:ok, %{:storage_table => storage_table, :timer => timer}}
     end
 
-    def handle_call({:create, {key, value}}, _from, %{:ttl => ttl, :storage_table => storage_table} = state) do
+    def handle_call({:create, {key, value, ttl}}, _from, %{:storage_table => storage_table} = state) do
         expiration = :os.system_time(:seconds) + ttl
         :dets.insert_new(storage_table, {key, value, expiration})
         {:reply, :ok, state}

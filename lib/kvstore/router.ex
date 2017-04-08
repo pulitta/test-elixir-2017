@@ -21,7 +21,10 @@ defmodule Router do
 
     match _, do: send_resp(conn, 404, "error")
 
-    defp call(%{"action" => "create", "key" => key, "value" => value}), do: Storage.create({key, value})
+    defp call(%{"action" => "create", "key" => key, "value" => value, "ttl" => ttl}) do 
+        {intTTL, _} = Integer.parse(ttl)
+        Storage.create({key, value, intTTL})
+    end
     defp call(%{"action" => "read", "key" => key}), do: Storage.read(key)
     defp call(%{"action" => "update", "key" => key, "value" => value}), do: Storage.update({key, value})
     defp call(%{"action" => "delete", "key" => key}), do: Storage.delete(key)

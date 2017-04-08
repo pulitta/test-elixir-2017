@@ -30,5 +30,4 @@ use Mix.Config
 #     import_config "#{Mix.env}.exs"
 
 config :kvstore, 
-    ttl: 60,                 # <- in sec
     storage: :kv_storage     # <- dets storag
