@@ -1,10 +1,9 @@
 defmodule KVstoreTest do
     use ExUnit.Case
-    
+
         @moduletag timeout: 65000
 
         setup_all do
-             KVstore.start([], [])
              storage = Application.get_env(:kv, :storage, :kv_storage)
             {:ok, %{:storage => storage}}
         end
@@ -61,16 +60,5 @@ defmodule KVstoreTest do
             assert expected1 == result1
             assert expected2 == result2
         end
-
-        test "Stop application", state do
-            :ok = Storage.create({:key6, 6})
-            KVstore.stop([])
-            KVstore.start([], [])
-            result = Storage.read(:key6)
-            expected = 6
-
-            assert expected == result
-        end
-
 
 end
